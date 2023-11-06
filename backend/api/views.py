@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from django.http import JsonResponse, HttpRequest
+from django.http import JsonResponse, HttpRequest, HttpResponse
+from django.forms.models import model_to_dict
 from typing import Dict
 import json
 
@@ -21,12 +22,11 @@ def echo(request: HttpRequest, *args: any, **kwargs: any) -> JsonResponse:
     data['content_type'] = request.content_type
     return JsonResponse(data)
 
-def random_product(request: HttpRequest, *args: any, **kwargs: any) -> JsonResponse:
+def random_product(request: HttpRequest, *args: any, **kwargs: any) -> HttpResponse:
     model_data = Product.objects.all().order_by("?").first()
     data = {}
     if model_data:
-        data['id'] = model_data.id
-        data['title'] = model_data.title
-        data['content'] = model_data.content
-        data['price'] = model_data.price
+        data = model_to_dict(model_data, fields=['id', 'title', 'price'])
+    #     json_data_str = json.dumps(data)
+    # return HttpResponse(json_data_str, headers={"content-type": "application/json"})
     return JsonResponse(data)
